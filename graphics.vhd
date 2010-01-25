@@ -8,7 +8,7 @@ entity graphics is
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         video_on: in std_logic;
-        rgb_stream: out std_logic_vector(0 to 2);
+        rgb_stream: out std_logic_vector(2 downto 0);
         shot, destroyed: out std_logic
     );
 end graphics;
@@ -19,7 +19,7 @@ architecture dispatcher of graphics is
     signal missile_enabled: std_logic;
     signal missile_coord_x, missile_coord_y: std_logic_vector(9 downto 0);
 
-    signal alien1_rgb: std_logic_vector(0 to 2);
+    signal alien1_rgb: std_logic_vector(2 downto 0);
 begin
 
     process(clk, reset)

@@ -6,13 +6,13 @@ entity main is
     port(
         clk, reset: in std_logic;
         hsync, vsync: out std_logic;
-        rgb: out std_logic_vector(0 to 2)
+        rgb: out std_logic_vector(2 downto 0)
         --buzzer: out std_logic
     );
 end main;
 
 architecture behavior of main is
-    signal rgb_reg, rgb_next: std_logic_vector(0 to 2);
+    signal rgb_reg, rgb_next: std_logic_vector(2 downto 0);
     signal video_on: std_logic;
     signal px_x, px_y: std_logic_vector(9 downto 0);
 
