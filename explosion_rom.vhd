@@ -5,12 +5,12 @@ use ieee.std_logic_unsigned.all;
 entity explosion_rom is
     port(
         addr: in std_logic_vector(9 downto 0);
-        data: out std_logic_vector(0 to 2)
+        data: out std_logic_vector(2 downto 0)
     );
 end explosion_rom;
 
 architecture content of explosion_rom is
-    type rgb_array is array(0 to 31) of std_logic_vector(0 to 2);
+    type rgb_array is array(0 to 31) of std_logic_vector(2 downto 0);
     type rom_type is array(0 to 31) of rgb_array;
 
     signal rgb_row: rgb_array;
