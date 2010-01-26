@@ -50,7 +50,7 @@ begin
         if reset = '1' then
             frame <= '0';
             frame_counter <= (others => '0');
-            alive <= "11011011";--(others => '1');
+            alive <= (others => '1');
         elsif falling_edge(clk) then
             frame <= frame_next;
             frame_counter <= frame_counter_next;
@@ -73,9 +73,8 @@ begin
                                px_y < master_coord_y + OFFSET + A_HEIGHT) else
                      '0';
 
-    row_address <= px_y(4 downto 0) - master_coord_y;
-    col_address <= px_x(4 downto 0) - master_coord_x;
-
+    row_address <= px_y(4 downto 0) - master_coord_y(4 downto 0);
+    col_address <= px_x(4 downto 0) - master_coord_x(4 downto 0);
     addr <= row_address & col_address;
 
     alien_rgb <= alien11_rgb when frame = '0' else

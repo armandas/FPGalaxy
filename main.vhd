@@ -5,6 +5,7 @@ use ieee.std_logic_unsigned.all;
 entity main is
     port(
         clk, reset: in std_logic;
+        nes1_a: in std_logic;
         hsync, vsync: out std_logic;
         rgb: out std_logic_vector(2 downto 0)
         --buzzer: out std_logic
@@ -13,7 +14,7 @@ end main;
 
 architecture behavior of main is
     signal rgb_reg, rgb_next: std_logic_vector(2 downto 0);
-    signal video_on: std_logic;
+    signal video_on, p_tick: std_logic;
     signal px_x, px_y: std_logic_vector(9 downto 0);
 
     signal shot, destroyed: std_logic;
@@ -30,7 +31,7 @@ begin
         port map(
             clk => clk, reset => reset,
             hsync => hsync, vsync => vsync,
-            video_on => video_on, p_tick => open,
+            video_on => video_on, p_tick => p_tick,
             pixel_x => px_x, pixel_y => px_y
         );
 
@@ -39,7 +40,8 @@ begin
         port map(
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
-            video_on => video_on,
+            video_on => video_on, p_tick => p_tick,
+            nes1_a => nes1_a,
             rgb_stream => rgb_next,
             shot => shot, destroyed => destroyed
         );
