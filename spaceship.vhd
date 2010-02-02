@@ -15,6 +15,9 @@ entity spaceship is
 end spaceship;
 
 architecture behaviour of spaceship is
+    constant SCREEN_W: integer := 640;
+    constant SCREEN_H: integer := 480;
+
     -- how far down the spaceship will be
     constant OFFSET: integer := 416;
     -- size of the spaceship frame (32x32)
@@ -41,8 +44,10 @@ begin
         end if;
     end process;
 
-    position_next <= position + 1 when (nes1_right = '1') else
-                     position - 1 when (nes1_left = '1') else
+    position_next <= position + 1 when (nes1_right = '1' and
+                                        position + SIZE < SCREEN_W) else
+                     position - 1 when (nes1_left = '1' and
+                                        position > 0) else
                      position;
 
     row_address <= px_y(4 downto 0) - OFFSET;
