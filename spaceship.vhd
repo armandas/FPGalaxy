@@ -7,7 +7,7 @@ entity spaceship is
     port(
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
-        p_tick: in std_logic;
+        nes1_left, nes1_right: std_logic;
         spaceship_x, spaceship_y: out std_logic_vector(9 downto 0);
         destroyed: out std_logic;
         rgb_pixel: out std_logic_vector(0 to 2)
@@ -32,19 +32,18 @@ architecture behaviour of spaceship is
     -- x-coordinate of the spaceship
     signal position, position_next: std_logic_vector(9 downto 0);
 begin
-
-    process(clk, reset)
+    process(clk, reset, position_next)
     begin
-        if reset = '1' then
-            position <= conv_std_logic_vector(315, 10);
+        if reset = '0' then
+            position <= conv_std_logic_vector(305, 10);
         elsif falling_edge(clk) then
             position <= position_next;
         end if;
     end process;
 
-    position_next <= position;-- + 1 when (right = '1' and p_tick = '1') else
-                     --position - 1 when (left = '1' and p_tick = '1') else
-                     --position;
+    position_next <= position + 1 when (nes1_right = '1') else
+                     position - 1 when (nes1_left = '1') else
+                     position;
 
     row_address <= px_y(4 downto 0) - OFFSET;
     col_address <= px_x(4 downto 0) - position(4 downto 0);
@@ -60,6 +59,7 @@ begin
                  (others => '0');
 
     -- +13 gives the center coordinate
+    -- this is used in missile.vhd
     spaceship_x <= position + 13;
     spaceship_y <= conv_std_logic_vector(OFFSET, 10);
 

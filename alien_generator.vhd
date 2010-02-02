@@ -35,6 +35,11 @@ architecture generator of alien is
     signal alive: std_logic_vector(0 to 7);
     signal alien_alive: std_logic;
 
+    -- has the alien been hit
+    signal hit: std_logic;
+    signal hit_row_address, hit_col_address: std_logic_vector(4 downto 0);
+    signal hit_address: std_logic_vector(9 downto 0);
+
     signal frame, frame_next: std_logic;
     signal frame_counter, frame_counter_next: std_logic_vector(24 downto 0);
 
@@ -47,7 +52,7 @@ begin
 
     process(clk, reset)
     begin
-        if reset = '1' then
+        if reset = '0' then
             frame <= '0';
             frame_counter <= (others => '0');
             alive <= (others => '1');
@@ -56,6 +61,11 @@ begin
             frame_counter <= frame_counter_next;
         end if;
     end process;
+
+    hit_row_address <= missile_coord_y(4 downto 0);
+    hit_col_address <= missile_coord_x(4 downto 0);
+    hit_address <= hit_row_address & hit_col_address;
+    hit <= '1' when 
 
     relative_x <= px_x - master_coord_x;
     alien_number <= relative_x(7 downto 5);

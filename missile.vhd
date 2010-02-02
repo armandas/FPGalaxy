@@ -6,7 +6,7 @@ entity missile is
     port(
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
-        nes1_a: in std_logic;
+        nes1_a, nes1_b: in std_logic;
         x_position, y_position: in std_logic_vector(9 downto 0);
         destruction: in std_logic;
         missile_coord_x, missile_coord_y: out std_logic_vector(9 downto 0);
@@ -20,7 +20,7 @@ architecture behaviour of missile is
     type rom_type is array(0 to HEIGHT - 1) of
          std_logic_vector(WIDTH - 1 downto 0);
     constant MISSILE: rom_type := ("0100", "1110", "1110", "1010");
-    constant DELAY: integer := 50000;
+    constant DELAY: integer := 50000; -- 1kHz
 
     signal counter, counter_next: std_logic_vector(15 downto 0);
 
@@ -29,14 +29,15 @@ architecture behaviour of missile is
 
     signal output_enable: std_logic;
     signal missile_ready, missile_ready_next: std_logic;
+    signal button_pressed: std_logic;
 
     signal x_coordinate, x_coordinate_next: std_logic_vector(9 downto 0);
     signal y_coordinate, y_coordinate_next: std_logic_vector(9 downto 0);
 begin
 
-    process(clk, reset)
+    process(clk, reset, x_position, y_position)
     begin
-        if reset = '1' then
+        if reset = '0' then
             counter <= (others => '0');
             missile_ready <= '1';
             x_coordinate <= x_position;
@@ -49,7 +50,9 @@ begin
         end if;
     end process;
 
-    missile_ready_next <= '0' when (nes1_a = '1' and
+    button_pressed <= '1' when (nes1_a = '1' or nes1_b = '1') else '0';
+
+    missile_ready_next <= '0' when (button_pressed = '1' and
                                     missile_ready = '1') else
                           '1' when (destruction = '1' or
                                     y_coordinate < 10) else
@@ -74,7 +77,7 @@ begin
     counter_next <= counter + 1 when counter < DELAY else (others => '0');
 
     x_coordinate_next <= x_position when (missile_ready = '1' and
-                                          nes1_a = '1') else
+                                          button_pressed = '1') else
                          x_coordinate when missile_ready = '0' else
                          (others => '0');
 

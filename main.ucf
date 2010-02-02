@@ -2,4 +2,4 @@ NET "clk" LOC = "C9";
 NET "clk" TNM_NET = "clk";
 TIMESPEC "TS_clk" = PERIOD "clk" 20 ns;
 
-NET "nes1_a" LOC = "K17" | IOSTANDARD = LVTTL | PULLDOWN;
+NET "reset" LOC = "A6" | IOSTANDARD = LVTTL | PULLUP;

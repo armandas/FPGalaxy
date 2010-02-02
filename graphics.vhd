@@ -7,8 +7,8 @@ entity graphics is
     port(
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
-        video_on, p_tick: in std_logic;
-        nes1_a: in std_logic;
+        video_on: in std_logic;
+        nes1_a, nes1_b, nes1_left, nes1_right: in std_logic;
         rgb_stream: out std_logic_vector(2 downto 0);
         shot, destroyed: out std_logic
     );
@@ -33,14 +33,14 @@ begin
 
     process(clk, reset)
     begin
-        if reset = '1' then
+        if reset = '0' then
             master_coord_x <= conv_std_logic_vector(192, 10);
             master_coord_y <= conv_std_logic_vector(32, 10);
         --elsif falling_edge(clk) then
         end if;
     end process;
 
-    process(video_on, alien1_rgb)
+    process(video_on, alien1_rgb, spaceship_rgb, missile_rgb)
     begin
         if video_on = '1' then
             rgb_stream <= "000" or
@@ -72,7 +72,7 @@ begin
         port map(
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
-            p_tick => p_tick,
+            nes1_left => nes1_left, nes1_right => nes1_right,
             spaceship_x => spaceship_x,
             spaceship_y => spaceship_y,
             destroyed => colision,
@@ -84,7 +84,7 @@ begin
         port map(
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
-            nes1_a => nes1_a,
+            nes1_a => nes1_a, nes1_b => nes1_b,
             x_position => spaceship_x,
             y_position => spaceship_y,
             destruction => destruction,
