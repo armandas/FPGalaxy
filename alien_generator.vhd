@@ -30,20 +30,19 @@ architecture generator of alien is
     signal row_address, col_address: std_logic_vector(4 downto 0);
 
     signal relative_x: std_logic_vector(9 downto 0);
+    signal missile_relative_x: std_logic_vector(9 downto 0);
+    signal position_in_frame: std_logic_vector(4 downto 0);
+
+    signal attacked_alien: std_logic_vector(2 downto 0);
+    
 
     -- condition of aliens: left (0) to right (7)
-    signal alive: std_logic_vector(0 to 7);
+    signal alive, alive_next: std_logic_vector(0 to 7);
     signal alien_alive: std_logic;
-
-    -- has the alien been hit
-    signal hit: std_logic;
-    signal hit_row_address, hit_col_address: std_logic_vector(4 downto 0);
-    signal hit_address: std_logic_vector(9 downto 0);
 
     signal frame, frame_next: std_logic;
     signal frame_counter, frame_counter_next: std_logic_vector(24 downto 0);
 
-    signal alien1_addr: std_logic_vector(9 downto 0);
     signal alien_rgb, alien11_rgb, alien12_rgb: std_logic_vector(2 downto 0);
     -- which alien is currently being drawn
     -- leftmost = 0, rightmost = 7
@@ -59,13 +58,31 @@ begin
         elsif falling_edge(clk) then
             frame <= frame_next;
             frame_counter <= frame_counter_next;
+            alive <= alive_next;
         end if;
     end process;
 
-    hit_row_address <= missile_coord_y(4 downto 0);
-    hit_col_address <= missile_coord_x(4 downto 0);
-    hit_address <= hit_row_address & hit_col_address;
-    hit <= '1' when 
+    missile_relative_x <= missile_coord_x - master_coord_x;
+    attacked_alien <= missile_relative_x(7 downto 5);
+    position_in_frame <= missile_relative_x(4 downto 0);
+
+    process(missile_coord_x, missile_coord_y,
+            master_coord_x, master_coord_y,
+            alive, position_in_frame)
+    begin
+        alive_next <= alive;
+        destroyed <= '0';
+
+        if missile_coord_y < master_coord_y + OFFSET + A_HEIGHT and
+           missile_coord_x > master_coord_x and
+           missile_coord_x < master_coord_x + A_WIDTH and
+           alive(conv_integer(attacked_alien)) = '1' and
+           position_in_frame > 0 and position_in_frame < 29
+        then
+            destroyed <= '1';
+            alive_next(conv_integer(attacked_alien)) <= '0';
+        end if;
+    end process;
 
     relative_x <= px_x - master_coord_x;
     alien_number <= relative_x(7 downto 5);

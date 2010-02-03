@@ -52,7 +52,7 @@ begin
             nes1_a => nes1_a, nes1_b => nes1_b,
             nes1_left => nes1_left, nes1_right => nes1_right,
             rgb_stream => rgb_next,
-            shot => shot, destroyed => destroyed
+            shooting_sound => shot, destruction_sound => destroyed
         );
 
     NES_controllers:

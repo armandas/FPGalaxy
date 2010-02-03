@@ -10,7 +10,7 @@ entity graphics is
         video_on: in std_logic;
         nes1_a, nes1_b, nes1_left, nes1_right: in std_logic;
         rgb_stream: out std_logic_vector(2 downto 0);
-        shot, destroyed: out std_logic
+        shooting_sound, destruction_sound: out std_logic
     );
 end graphics;
 
@@ -53,6 +53,7 @@ begin
     end process;
 
     destruction <= destroyed1 or destroyed2 or destroyed3 or colision;
+    destruction_sound <= destruction;
 
     alien1:
         entity work.alien(generator)

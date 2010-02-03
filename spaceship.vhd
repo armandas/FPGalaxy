@@ -38,7 +38,7 @@ begin
     process(clk, reset, position_next)
     begin
         if reset = '0' then
-            position <= conv_std_logic_vector(305, 10);
+            position <= conv_std_logic_vector(304, 10);
         elsif falling_edge(clk) then
             position <= position_next;
         end if;
