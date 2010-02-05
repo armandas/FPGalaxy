@@ -76,7 +76,7 @@ begin
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
             destroyed => destroyed1,
-            origin_x => origin1_x, origin_y => origin1_y,
+            explosion_x => origin1_x, explosion_y => origin1_y,
             rgb_pixel => alien1_rgb
         );
 
