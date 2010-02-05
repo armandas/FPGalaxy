@@ -91,10 +91,12 @@ begin
         destruction <= '0';
         alive_next <= alive;
 
-        if missile_arrived = '1' and
-           alive(conv_integer(attacked_alien)) = '1' and
-           position_in_frame > 0 and
-           position_in_frame < 29
+        if alive = 0 then
+            alive_next <= (others => '1');
+        elsif missile_arrived = '1' and
+              alive(conv_integer(attacked_alien)) = '1' and
+              position_in_frame > 0 and
+              position_in_frame < 29
         then
             destruction <= '1';
             alive_next(conv_integer(attacked_alien)) <= '0';
@@ -139,7 +141,8 @@ begin
     -- attacked alien number is multiplied by 32
     origin_x_next <= master_coord_x + (attacked_alien & "00000") when missile_arrived = '1' else
                      origin_x;
-    origin_y_next <= master_coord_y + OFFSET;
+    origin_y_next <= master_coord_y + OFFSET when missile_arrived = '1' else
+                     origin_y;
 
     explosion_x <= origin_x;
     explosion_y <= origin_y;
