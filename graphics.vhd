@@ -22,9 +22,15 @@ architecture dispatcher of graphics is
     -- x-coordinate of the spaceship
     signal spaceship_x, spaceship_y: std_logic_vector(9 downto 0);
 
+    -- origin for explosion animation
+    signal origin_x, origin_y: std_logic_vector(9 downto 0);
+    -- alien-level-specific origins
+    signal origin1_x, origin1_y: std_logic_vector(9 downto 0);
+
     signal alien1_rgb: std_logic_vector(2 downto 0);
     signal spaceship_rgb: std_logic_vector(2 downto 0);
     signal missile_rgb: std_logic_vector(2 downto 0);
+    signal explosion_rgb: std_logic_vector(2 downto 0);
 
     signal destruction: std_logic;
     signal destroyed1, destroyed2, destroyed3: std_logic;
@@ -40,13 +46,16 @@ begin
         end if;
     end process;
 
-    process(video_on, alien1_rgb, spaceship_rgb, missile_rgb)
+    process(video_on,
+        alien1_rgb, spaceship_rgb,
+        missile_rgb, explosion_rgb)
     begin
         if video_on = '1' then
             rgb_stream <= "000" or
                           alien1_rgb or
                           spaceship_rgb or
-                          missile_rgb;
+                          missile_rgb or
+                          explosion_rgb;
         else
             rgb_stream <= (others => '0');
         end if;
@@ -54,6 +63,8 @@ begin
 
     destruction <= destroyed1 or destroyed2 or destroyed3 or colision;
     destruction_sound <= destruction;
+    origin_x <= origin1_x;--origin2_x or origin3_x;
+    origin_y <= origin1_y;--origin2_y or origin3_y;
 
     alien1:
         entity work.alien(generator)
@@ -65,6 +76,7 @@ begin
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
             destroyed => destroyed1,
+            origin_x => origin1_x, origin_y => origin1_y,
             rgb_pixel => alien1_rgb
         );
 
@@ -92,6 +104,16 @@ begin
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
             rgb_pixel => missile_rgb
+        );
+
+    explosion:
+        entity work.explosion(behaviour)
+        port map(
+            clk => clk, reset => reset,
+            px_x => px_x, px_y => px_y,
+            destruction => destruction,
+            origin_x => origin_x, origin_y => origin_y,
+            rgb_pixel => explosion_rgb
         );
 end dispatcher;
 

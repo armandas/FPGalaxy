@@ -9,6 +9,7 @@ entity alien is
         master_coord_x, master_coord_y: in std_logic_vector(9 downto 0);
         missile_coord_x, missile_coord_y: in std_logic_vector(9 downto 0);
         destroyed: out std_logic;
+        origin_x, origin_y: out std_logic_vector(9 downto 0);
         rgb_pixel: out std_logic_vector(0 to 2)
     );
 end alien;
@@ -34,7 +35,7 @@ architecture generator of alien is
     signal position_in_frame: std_logic_vector(4 downto 0);
 
     signal attacked_alien: std_logic_vector(2 downto 0);
-    
+    signal destruction: std_logic;
 
     -- condition of aliens: left (0) to right (7)
     signal alive, alive_next: std_logic_vector(0 to 7);
@@ -68,10 +69,10 @@ begin
 
     process(missile_coord_x, missile_coord_y,
             master_coord_x, master_coord_y,
-            alive, position_in_frame)
+            alive, position_in_frame, attacked_alien)
     begin
         alive_next <= alive;
-        destroyed <= '0';
+        destruction <= '0';
 
         if missile_coord_y < master_coord_y + OFFSET + A_HEIGHT and
            missile_coord_x > master_coord_x and
@@ -79,8 +80,12 @@ begin
            alive(conv_integer(attacked_alien)) = '1' and
            position_in_frame > 0 and position_in_frame < 29
         then
-            destroyed <= '1';
+            destruction <= '1';
             alive_next(conv_integer(attacked_alien)) <= '0';
+
+            -- attacked alien number is multiplied by 32
+            origin_x <= master_coord_x + (attacked_alien & "00000");
+            origin_y <= master_coord_y + OFFSET;
         end if;
     end process;
 
@@ -109,6 +114,8 @@ begin
 
     rgb_pixel <= alien_rgb when output_enable = '1' else
                  (others => '0');
+
+    destroyed <= destruction;
 
     alien_11:
         entity work.alien11_rom(content)
