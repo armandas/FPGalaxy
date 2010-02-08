@@ -30,8 +30,7 @@ architecture generator of alien is
     signal addr: std_logic_vector(9 downto 0);
     signal row_address, col_address: std_logic_vector(4 downto 0);
 
-    signal origin_x, origin_x_next,
-           origin_y, origin_y_next: std_logic_vector(9 downto 0);
+    signal origin_x, origin_y: std_logic_vector(9 downto 0);
 
     signal relative_x: std_logic_vector(9 downto 0);
     signal missile_relative_x: std_logic_vector(9 downto 0);
@@ -62,14 +61,10 @@ begin
             frame <= '0';
             frame_counter <= (others => '0');
             alive <= (others => '1');
-            origin_x <= (others => '0');
-            origin_y <= (others => '0');
         elsif falling_edge(clk) then
             frame <= frame_next;
             frame_counter <= frame_counter_next;
             alive <= alive_next;
-            origin_x <= origin_x_next;
-            origin_y <= origin_y_next;
         end if;
     end process;
 
@@ -86,27 +81,22 @@ begin
                          (others => '0');
 
     process(missile_coord_x, master_coord_x,
-        missile_arrived, alive, position_in_frame)
+            missile_arrived, alive, position_in_frame)
     begin
         destruction <= '0';
         alive_next <= alive;
 
-        if alive = 0 then
-            alive_next <= (others => '1');
-        elsif missile_arrived = '1' and
-              alive(conv_integer(attacked_alien)) = '1' and
-              position_in_frame > 0 and
-              position_in_frame < 29
+        --if alive = 0 then
+        --    alive_next <= (others => '1');
+        if missile_arrived = '1' and
+           alive(conv_integer(attacked_alien)) = '1' and
+           position_in_frame > 0 and
+           position_in_frame < 29
         then
             destruction <= '1';
             alive_next(conv_integer(attacked_alien)) <= '0';
         end if;
      end process;
-
---    destruction <= '1' when (alive(conv_integer(attacked_alien)) = '1' and
---                             position_in_frame > 0 and
---                             position_in_frame < 29) else
---                   '0';
 
     relative_x <= px_x - master_coord_x;
     alien_number <= relative_x(7 downto 5);
@@ -135,14 +125,10 @@ begin
                  (others => '0');
 
     destroyed <= destruction;
---    alive_next(conv_integer(attacked_alien)) <= '0' when destruction = '1' else
---                                                alive(conv_integer(attacked_alien));
 
     -- attacked alien number is multiplied by 32
-    origin_x_next <= master_coord_x + (attacked_alien & "00000") when missile_arrived = '1' else
-                     origin_x;
-    origin_y_next <= master_coord_y + OFFSET when missile_arrived = '1' else
-                     origin_y;
+    origin_x <= master_coord_x + (attacked_alien & "00000");
+    origin_y <= master_coord_y + OFFSET;
 
     explosion_x <= origin_x;
     explosion_y <= origin_y;

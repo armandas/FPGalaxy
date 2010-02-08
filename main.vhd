@@ -8,9 +8,9 @@ entity main is
         hsync, vsync: out std_logic;
         rgb: out std_logic_vector(2 downto 0);
         --buzzer: out std_logic
-        data_1, data_2: in std_logic;
-        clk_out: out std_logic;
-        ps_control: out std_logic
+        nes_data: in std_logic;
+        nes_clk_out: out std_logic;
+        nes_ps_control: out std_logic
     );
 end main;
 
@@ -21,10 +21,10 @@ architecture behavior of main is
 
     signal shot, destroyed: std_logic;
 
-    signal nes1_a, nes1_b,
-           nes1_select, nes1_start,
-           nes1_up, nes1_down,
-           nes1_left, nes1_right: std_logic;
+    signal nes_a, nes_b,
+           nes_select, nes_start,
+           nes_up, nes_down,
+           nes_left, nes_right: std_logic;
 
 begin
     process(clk)
@@ -49,24 +49,23 @@ begin
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
             video_on => video_on,
-            nes1_a => nes1_a, nes1_b => nes1_b,
-            nes1_left => nes1_left, nes1_right => nes1_right,
+            nes_a => nes_a, nes_b => nes_b,
+            nes_left => nes_left, nes_right => nes_right,
             rgb_stream => rgb_next,
             shooting_sound => shot, destruction_sound => destroyed
         );
 
-    NES_controllers:
+    NES_controller:
         entity work.controller(arch)
         port map(
             clk => clk, reset => reset,
-            data_1 => data_1, data_2 => data_2,
-            clk_out => clk_out,
-            ps_control => ps_control,
-            gamepad1(0) => nes1_a,      gamepad1(1) => nes1_b,
-            gamepad1(2) => nes1_select, gamepad1(3) => nes1_start,
-            gamepad1(4) => nes1_up,     gamepad1(5) => nes1_down,
-            gamepad1(6) => nes1_left,   gamepad1(7) => nes1_right,
-            gamepad2 => open
+            data_in => nes_data,
+            clk_out => nes_clk_out,
+            ps_control => nes_ps_control,
+            gamepad(0) => nes_a,      gamepad(1) => nes_b,
+            gamepad(2) => nes_select, gamepad(3) => nes_start,
+            gamepad(4) => nes_up,     gamepad(5) => nes_down,
+            gamepad(6) => nes_left,   gamepad(7) => nes_right
         );
 
     rgb <= rgb_reg;

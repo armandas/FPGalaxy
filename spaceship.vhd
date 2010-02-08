@@ -7,7 +7,7 @@ entity spaceship is
     port(
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
-        nes1_left, nes1_right: std_logic;
+        nes_left, nes_right: std_logic;
         spaceship_x, spaceship_y: out std_logic_vector(9 downto 0);
         destroyed: out std_logic;
         rgb_pixel: out std_logic_vector(0 to 2)
@@ -44,9 +44,9 @@ begin
         end if;
     end process;
 
-    position_next <= position + 1 when (nes1_right = '1' and
+    position_next <= position + 1 when (nes_right = '1' and
                                         position + SIZE < SCREEN_W) else
-                     position - 1 when (nes1_left = '1' and
+                     position - 1 when (nes_left = '1' and
                                         position > 0) else
                      position;
 

@@ -6,7 +6,7 @@ entity missile is
     port(
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
-        nes1_a, nes1_b: in std_logic;
+        nes_a, nes_b: in std_logic;
         x_position, y_position: in std_logic_vector(9 downto 0);
         destruction: in std_logic;
         missile_coord_x, missile_coord_y: out std_logic_vector(9 downto 0);
@@ -50,7 +50,7 @@ begin
         end if;
     end process;
 
-    button_pressed <= '1' when (nes1_a = '1' or nes1_b = '1') else '0';
+    button_pressed <= '1' when (nes_a = '1' or nes_b = '1') else '0';
 
     missile_ready_next <= '0' when (button_pressed = '1' and
                                     missile_ready = '1') else

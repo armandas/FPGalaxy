@@ -8,7 +8,7 @@ entity graphics is
         clk, reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         video_on: in std_logic;
-        nes1_a, nes1_b, nes1_left, nes1_right: in std_logic;
+        nes_a, nes_b, nes_left, nes_right: in std_logic;
         rgb_stream: out std_logic_vector(2 downto 0);
         shooting_sound, destruction_sound: out std_logic
     );
@@ -23,11 +23,14 @@ architecture dispatcher of graphics is
     signal spaceship_x, spaceship_y: std_logic_vector(9 downto 0);
 
     -- origin for explosion animation
-    signal origin_x, origin_y: std_logic_vector(9 downto 0);
+    signal origin_x, origin_x_next: std_logic_vector(9 downto 0);
+    signal origin_y, origin_y_next: std_logic_vector(9 downto 0);
+
     -- alien-level-specific origins
     signal origin1_x, origin1_y: std_logic_vector(9 downto 0);
+    signal origin2_x, origin2_y: std_logic_vector(9 downto 0);
 
-    signal alien1_rgb: std_logic_vector(2 downto 0);
+    signal alien1_rgb, alien2_rgb: std_logic_vector(2 downto 0);
     signal spaceship_rgb: std_logic_vector(2 downto 0);
     signal missile_rgb: std_logic_vector(2 downto 0);
     signal explosion_rgb: std_logic_vector(2 downto 0);
@@ -42,17 +45,23 @@ begin
         if reset = '0' then
             master_coord_x <= conv_std_logic_vector(192, 10);
             master_coord_y <= conv_std_logic_vector(32, 10);
-        --elsif falling_edge(clk) then
+            origin_x <= (others => '0');
+            origin_y <= (others => '0');
+        elsif falling_edge(clk) then
+            origin_x <= origin_x_next;
+            origin_y <= origin_y_next;
         end if;
     end process;
 
     process(video_on,
-        alien1_rgb, spaceship_rgb,
+        alien1_rgb, alien2_rgb,
+        spaceship_rgb,
         missile_rgb, explosion_rgb)
     begin
         if video_on = '1' then
             rgb_stream <= "000" or
                           alien1_rgb or
+                          alien2_rgb or
                           spaceship_rgb or
                           missile_rgb or
                           explosion_rgb;
@@ -63,8 +72,15 @@ begin
 
     destruction <= destroyed1 or destroyed2 or destroyed3 or colision;
     destruction_sound <= destruction;
-    origin_x <= origin1_x;--origin2_x or origin3_x;
-    origin_y <= origin1_y;--origin2_y or origin3_y;
+    origin_x_next <= origin1_x when destroyed1 = '1' else
+                     origin2_x when destroyed2 = '1' else
+                     --oririn3_x when destroyed3 = '1' else
+                     origin_x;
+
+    origin_y_next <= origin1_y when destroyed1 = '1' else
+                     origin2_y when destroyed2 = '1' else
+                     --oririn3_y when destroyed3 = '1' else
+                     origin_y;
 
     alien1:
         entity work.alien(generator)
@@ -80,12 +96,26 @@ begin
             rgb_pixel => alien1_rgb
         );
 
+    alien2:
+        entity work.alien2(generator)
+        port map(
+            clk => clk, reset => reset,
+            px_x => px_x, px_y => px_y,
+            master_coord_x => master_coord_x,
+            master_coord_y => master_coord_y,
+            missile_coord_x => missile_coord_x,
+            missile_coord_y => missile_coord_y,
+            destroyed => destroyed2,
+            explosion_x => origin2_x, explosion_y => origin2_y,
+            rgb_pixel => alien2_rgb
+        );
+
     spaceship:
         entity work.spaceship(behaviour)
         port map(
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
-            nes1_left => nes1_left, nes1_right => nes1_right,
+            nes_left => nes_left, nes_right => nes_right,
             spaceship_x => spaceship_x,
             spaceship_y => spaceship_y,
             destroyed => colision,
@@ -97,7 +127,7 @@ begin
         port map(
             clk => clk, reset => reset,
             px_x => px_x, px_y => px_y,
-            nes1_a => nes1_a, nes1_b => nes1_b,
+            nes_a => nes_a, nes_b => nes_b,
             x_position => spaceship_x,
             y_position => spaceship_y,
             destruction => destruction,

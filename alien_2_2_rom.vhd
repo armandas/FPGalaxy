@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 entity alien22_rom is
     port(
         addr: in std_logic_vector(9 downto 0);
-        data: out std_logic_vector(2 downto 0s)
+        data: out std_logic_vector(2 downto 0)
     );
 end alien22_rom;
 
