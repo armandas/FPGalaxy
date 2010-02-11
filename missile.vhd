@@ -20,9 +20,9 @@ architecture behaviour of missile is
     type rom_type is array(0 to HEIGHT - 1) of
          std_logic_vector(WIDTH - 1 downto 0);
     constant MISSILE: rom_type := ("0100", "1110", "1110", "1010");
-    constant DELAY: integer := 50000; -- 500Hz
+    constant DELAY: integer := 50000; -- 1kHz
 
-    signal counter, counter_next: std_logic_vector(15 downto 0);
+    signal counter, counter_next: std_logic_vector(16 downto 0);
 
     signal row_address, col_address: std_logic_vector(1 downto 0);
     signal data: std_logic_vector(WIDTH - 1 downto 0);

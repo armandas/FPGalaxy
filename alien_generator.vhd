@@ -9,6 +9,7 @@ entity alien is
         master_coord_x, master_coord_y: in std_logic_vector(9 downto 0);
         missile_coord_x, missile_coord_y: in std_logic_vector(9 downto 0);
         destroyed: out std_logic;
+        defeated: out std_logic;
         explosion_x, explosion_y: out std_logic_vector(9 downto 0);
         rgb_pixel: out std_logic_vector(0 to 2)
     );
@@ -132,6 +133,8 @@ begin
 
     explosion_x <= origin_x;
     explosion_y <= origin_y;
+
+    defeated <= '1' when alive = 0 else '0';
 
     alien_11:
         entity work.alien11_rom(content)
