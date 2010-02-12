@@ -9,7 +9,6 @@ entity spaceship is
         px_x, px_y: in std_logic_vector(9 downto 0);
         nes_left, nes_right: std_logic;
         spaceship_x, spaceship_y: out std_logic_vector(9 downto 0);
-        destroyed: out std_logic;
         rgb_pixel: out std_logic_vector(0 to 2)
     );
 end spaceship;

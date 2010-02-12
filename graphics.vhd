@@ -18,9 +18,9 @@ architecture dispatcher of graphics is
     constant A_WIDTH: integer := 256;
     constant DELAY: integer := 25000000;
 
-    type states is (left, right, pause);
+    type states is (left, right);
     signal state, state_next: states;
-    type states_v is (up, down, pause);
+    type states_v is (up, down);
     signal state_v, state_v_next: states_v;
 
     -- alien movement counter
@@ -51,7 +51,6 @@ architecture dispatcher of graphics is
     signal destruction: std_logic;
     signal destroyed1, destroyed2, destroyed3: std_logic;
     signal defeated1, defeated2, defeated3: std_logic;
-    signal colision: std_logic;
 
     signal level, level_next: positive range 1 to 32;
 begin
@@ -97,7 +96,6 @@ begin
         
         if counter = 0 then
             case state_v is
-                when pause =>
                 when up =>
                     state_v_next <= down;
                     master_coord_y_next <= master_coord_y - 4;
@@ -107,7 +105,6 @@ begin
             end case;
 
             case state is
-                when pause =>
                 when right =>
                     if master_coord_x + A_WIDTH = 640 then
                         state_next <= left;
@@ -142,7 +139,7 @@ begin
         end if;
     end process;
 
-    destruction <= destroyed1 or destroyed2 or destroyed3 or colision;
+    destruction <= destroyed1 or destroyed2 or destroyed3;
     destruction_sound <= destruction;
 
     origin_x_next <= origin1_x when destroyed1 = '1' else
@@ -207,7 +204,6 @@ begin
             nes_left => nes_left, nes_right => nes_right,
             spaceship_x => spaceship_x,
             spaceship_y => spaceship_y,
-            destroyed => colision,
             rgb_pixel => spaceship_rgb
         );
 
@@ -222,6 +218,7 @@ begin
             destruction => destruction,
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
+            shooting => shooting_sound,
             rgb_pixel => missile_rgb
         );
 

@@ -6,9 +6,9 @@ entity main is
     port(
         clk, reset: in std_logic;
         hsync, vsync: out std_logic;
-        rgb: out std_logic_vector(2 downto 0);
-        --buzzer: out std_logic
         nes_data: in std_logic;
+        rgb: out std_logic_vector(2 downto 0);
+        buzzer: out std_logic;
         nes_clk_out: out std_logic;
         nes_ps_control: out std_logic
     );
@@ -26,6 +26,7 @@ architecture behavior of main is
            nes_up, nes_down,
            nes_left, nes_right: std_logic;
 
+    signal buzzer1, buzzer2: std_logic;
 begin
     process(clk)
     begin
@@ -53,6 +54,22 @@ begin
             nes_left => nes_left, nes_right => nes_right,
             rgb_stream => rgb_next,
             shooting_sound => shot, destruction_sound => destroyed
+        );
+
+    sound1:
+        entity work.player(behaviour)
+        port map(
+            clk => clk, reset => reset,
+            shooting_sound => shot, explosion_sound => '0',
+            buzzer => buzzer1
+        );
+    buzzer <= buzzer1 or buzzer2;
+    sound2:
+        entity work.player(behaviour)
+        port map(
+            clk => clk, reset => reset,
+            shooting_sound => '0', explosion_sound => destroyed,
+            buzzer => buzzer2
         );
 
     NES_controller:

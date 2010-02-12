@@ -10,6 +10,7 @@ entity missile is
         x_position, y_position: in std_logic_vector(9 downto 0);
         destruction: in std_logic;
         missile_coord_x, missile_coord_y: out std_logic_vector(9 downto 0);
+        shooting: out std_logic;
         rgb_pixel: out std_logic_vector(0 to 2)
     );
 end missile;
@@ -49,6 +50,10 @@ begin
             y_coordinate <= y_coordinate_next;
         end if;
     end process;
+
+    shooting <= '1' when (missile_ready = '1' and
+                          missile_ready_next = '0') else
+                '0';
 
     button_pressed <= '1' when (nes_a = '1' or nes_b = '1') else '0';
 
