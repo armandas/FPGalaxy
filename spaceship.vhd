@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 
 entity spaceship is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         nes_left, nes_right: std_logic;
         spaceship_x, spaceship_y: out std_logic_vector(9 downto 0);
@@ -34,9 +34,9 @@ architecture behaviour of spaceship is
     -- x-coordinate of the spaceship
     signal position, position_next: std_logic_vector(9 downto 0);
 begin
-    process(clk, reset, position_next)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             position <= conv_std_logic_vector(304, 10);
         elsif falling_edge(clk) then
             position <= position_next;

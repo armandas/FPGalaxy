@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 
 entity missile is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         nes_a, nes_b: in std_logic;
         x_position, y_position: in std_logic_vector(9 downto 0);
@@ -36,13 +36,13 @@ architecture behaviour of missile is
     signal y_coordinate, y_coordinate_next: std_logic_vector(9 downto 0);
 begin
 
-    process(clk, reset, x_position, y_position)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             counter <= (others => '0');
             missile_ready <= '1';
-            x_coordinate <= x_position;
-            y_coordinate <= y_position;
+            x_coordinate <= (others => '0');
+            y_coordinate <= (others => '0');
         elsif falling_edge(clk) then
             counter <= counter_next;
             missile_ready <= missile_ready_next;

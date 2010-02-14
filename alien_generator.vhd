@@ -4,10 +4,11 @@ use ieee.std_logic_unsigned.all;
 
 entity alien is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         master_coord_x, master_coord_y: in std_logic_vector(9 downto 0);
         missile_coord_x, missile_coord_y: in std_logic_vector(9 downto 0);
+        restart: in std_logic;
         destroyed: out std_logic;
         defeated: out std_logic;
         explosion_x, explosion_y: out std_logic_vector(9 downto 0);
@@ -56,9 +57,9 @@ architecture generator of alien is
     signal alien_number: std_logic_vector(2 downto 0);
 begin
 
-    process(clk, reset)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             frame <= '0';
             frame_counter <= (others => '0');
             alive <= (others => '1');
@@ -82,14 +83,15 @@ begin
                          (others => '0');
 
     process(missile_coord_x, master_coord_x,
-            missile_arrived, alive, position_in_frame)
+            missile_arrived, alive, position_in_frame,
+            restart)
     begin
         destruction <= '0';
         alive_next <= alive;
 
-        --if alive = 0 then
-        --    alive_next <= (others => '1');
-        if missile_arrived = '1' and
+        if restart = '1' then
+            alive_next <= (others => '1');
+        elsif missile_arrived = '1' and
            alive(conv_integer(attacked_alien)) = '1' and
            position_in_frame > 0 and
            position_in_frame < 29

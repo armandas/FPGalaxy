@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 
 entity graphics is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         video_on: in std_logic;
         nes_a, nes_b, nes_left, nes_right: in std_logic;
@@ -52,12 +52,15 @@ architecture dispatcher of graphics is
     signal destroyed1, destroyed2, destroyed3: std_logic;
     signal defeated1, defeated2, defeated3: std_logic;
 
+    -- for starting a new level
+    signal restart, restart_next: std_logic;
+
     signal level, level_next: positive range 1 to 32;
 begin
 
-    process(clk, reset)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             master_coord_x <= conv_std_logic_vector(192, 10);
             master_coord_y <= conv_std_logic_vector(34, 10);
             origin_x <= (others => '0');
@@ -66,6 +69,7 @@ begin
             state <= right;
             state_v <= up;
             counter <= (others => '0');
+            restart <= '0';
         elsif falling_edge(clk) then
             master_coord_x <= master_coord_x_next;
             master_coord_y <= master_coord_y_next;
@@ -75,10 +79,16 @@ begin
             state <= state_next;
             state_v <= state_v_next;
             counter <= counter_next;
+            restart <= restart_next;
         end if;
     end process;
 
     counter_next <= counter + 1 when counter < DELAY else (others => '0');
+
+    restart_next <= '1' when defeated1 = '1' and
+                             defeated2 = '1' and
+                             defeated3 = '1' else
+                    '0';
 
     level_next <= level + 1 when defeated1 = '1' and
                                  defeated2 = '1' and
@@ -155,12 +165,13 @@ begin
     alien1:
         entity work.alien(generator)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             master_coord_x => master_coord_x,
             master_coord_y => master_coord_y,
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
+            restart => restart,
             destroyed => destroyed1,
             defeated => defeated1,
             explosion_x => origin1_x, explosion_y => origin1_y,
@@ -170,12 +181,13 @@ begin
     alien2:
         entity work.alien2(generator)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             master_coord_x => master_coord_x,
             master_coord_y => master_coord_y,
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
+            restart => restart,
             destroyed => destroyed2,
             defeated => defeated2,
             explosion_x => origin2_x, explosion_y => origin2_y,
@@ -185,12 +197,13 @@ begin
     alien3:
         entity work.alien3(generator)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             master_coord_x => master_coord_x,
             master_coord_y => master_coord_y,
             missile_coord_x => missile_coord_x,
             missile_coord_y => missile_coord_y,
+            restart => restart,
             destroyed => destroyed3,
             defeated => defeated3,
             explosion_x => origin3_x, explosion_y => origin3_y,
@@ -199,7 +212,7 @@ begin
     spaceship:
         entity work.spaceship(behaviour)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             nes_left => nes_left, nes_right => nes_right,
             spaceship_x => spaceship_x,
@@ -210,7 +223,7 @@ begin
     missile:
         entity work.missile(behaviour)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             nes_a => nes_a, nes_b => nes_b,
             x_position => spaceship_x,
@@ -225,7 +238,7 @@ begin
     explosion:
         entity work.explosion(behaviour)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             destruction => destruction,
             origin_x => origin_x, origin_y => origin_y,

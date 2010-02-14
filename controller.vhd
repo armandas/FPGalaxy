@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
  
 entity controller is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         data_in: in std_logic;
         clk_out: out std_logic;
         ps_control: out std_logic;
@@ -24,9 +24,9 @@ architecture arch of controller is
  
     signal register_1, register_1_next: std_logic_vector(7 downto 0);
 begin
-    process(clk, reset)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             counter <= (others => '0');
             quad_counter <= (others => '0');
             ps_counter <= (others => '0');

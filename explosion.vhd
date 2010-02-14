@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 
 entity explosion is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
         destruction: in std_logic;
         origin_x, origin_y: std_logic_vector(9 downto 0);
@@ -37,9 +37,9 @@ architecture behaviour of explosion is
     signal explosion_rgb, explosion_mask: std_logic_vector(2 downto 0);
 begin
 
-    process(clk, reset)
+    process(clk, not_reset)
     begin
-        if reset = '0' then
+        if not_reset = '0' then
             state <= idle;
             counter <= (others => '0');
         elsif falling_edge(clk) then

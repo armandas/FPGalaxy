@@ -4,7 +4,7 @@ use ieee.std_logic_unsigned.all;
 
 entity main is
     port(
-        clk, reset: in std_logic;
+        clk, not_reset: in std_logic;
         hsync, vsync: out std_logic;
         nes_data: in std_logic;
         rgb: out std_logic_vector(2 downto 0);
@@ -38,7 +38,7 @@ begin
     vga:
         entity work.vga(sync)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             hsync => hsync, vsync => vsync,
             video_on => video_on, p_tick => open,
             pixel_x => px_x, pixel_y => px_y
@@ -47,7 +47,7 @@ begin
     graphics:
         entity work.graphics(dispatcher)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
             video_on => video_on,
             nes_a => nes_a, nes_b => nes_b,
@@ -59,7 +59,7 @@ begin
     sound1:
         entity work.player(behaviour)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             shooting_sound => shot, explosion_sound => '0',
             buzzer => buzzer1
         );
@@ -67,7 +67,7 @@ begin
     sound2:
         entity work.player(behaviour)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             shooting_sound => '0', explosion_sound => destroyed,
             buzzer => buzzer2
         );
@@ -75,7 +75,7 @@ begin
     NES_controller:
         entity work.controller(arch)
         port map(
-            clk => clk, reset => reset,
+            clk => clk, not_reset => not_reset,
             data_in => nes_data,
             clk_out => nes_clk_out,
             ps_control => nes_ps_control,
