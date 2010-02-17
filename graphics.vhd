@@ -47,6 +47,7 @@ architecture dispatcher of graphics is
     signal spaceship_rgb: std_logic_vector(2 downto 0);
     signal missile_rgb: std_logic_vector(2 downto 0);
     signal explosion_rgb: std_logic_vector(2 downto 0);
+    signal level_rgb, score_rgb: std_logic_vector(2 downto 0);
 
     signal destruction: std_logic;
     signal destroyed1, destroyed2, destroyed3: std_logic;
@@ -55,7 +56,8 @@ architecture dispatcher of graphics is
     -- for starting a new level
     signal restart, restart_next: std_logic;
 
-    signal level, level_next: positive range 1 to 32;
+    signal level, level_next: std_logic_vector(8 downto 0);
+    signal score, score_next: std_logic_vector(15 downto 0);
 begin
 
     process(clk, not_reset)
@@ -65,7 +67,8 @@ begin
             master_coord_y <= conv_std_logic_vector(34, 10);
             origin_x <= (others => '0');
             origin_y <= (others => '0');
-            level <= 1;
+            level <= (0 => '1', others => '0');
+            score <= (others => '0');
             state <= right;
             state_v <= up;
             counter <= (others => '0');
@@ -76,6 +79,7 @@ begin
             origin_x <= origin_x_next;
             origin_y <= origin_y_next;
             level <= level_next;
+            score <= score_next;
             state <= state_next;
             state_v <= state_v_next;
             counter <= counter_next;
@@ -90,11 +94,15 @@ begin
                              defeated3 = '1' else
                     '0';
 
-    level_next <= level + 1 when defeated1 = '1' and
+    level_next <= level + 1 when counter(0) = '0' and
+                                 defeated1 = '1' and
                                  defeated2 = '1' and
                                  defeated3 = '1' else
                   level;
 
+    score_next <= score + 2 when destruction = '1' else score;
+
+    alien_movement:
     process(state, state_v, state_next,
             master_coord_x, master_coord_y,
             counter)
@@ -134,7 +142,8 @@ begin
     process(video_on,
             alien1_rgb, alien2_rgb, alien3_rgb,
             spaceship_rgb,
-            missile_rgb, explosion_rgb)
+            missile_rgb, explosion_rgb,
+            level_rgb, score_rgb)
     begin
         if video_on = '1' then
             rgb_stream <= "000" or
@@ -143,7 +152,9 @@ begin
                           alien3_rgb or
                           spaceship_rgb or
                           missile_rgb or
-                          explosion_rgb;
+                          explosion_rgb or
+                          level_rgb or
+                          score_rgb;
         else
             rgb_stream <= (others => '0');
         end if;
@@ -243,6 +254,24 @@ begin
             destruction => destruction,
             origin_x => origin_x, origin_y => origin_y,
             rgb_pixel => explosion_rgb
+        );
+
+    level_display:
+        entity work.level_info(display)
+        port map(
+            clk => clk, not_reset => not_reset,
+            px_x => px_x, px_y => px_y,
+            level => level,
+            rgb_pixel => level_rgb
+        );
+
+    score_display:
+        entity work.score_info(display)
+        port map(
+            clk => clk, not_reset => not_reset,
+            px_x => px_x, px_y => px_y,
+            score => score,
+            rgb_pixel => score_rgb
         );
 end dispatcher;
 
