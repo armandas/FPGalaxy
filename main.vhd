@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
-entity main is
+entity fpgalaxy is
     port(
         clk, not_reset: in std_logic;
         hsync, vsync: out std_logic;
@@ -12,9 +12,9 @@ entity main is
         nes_clk_out: out std_logic;
         nes_ps_control: out std_logic
     );
-end main;
+end fpgalaxy;
 
-architecture behavior of main is
+architecture behaviour of fpgalaxy is
     signal rgb_reg, rgb_next: std_logic_vector(2 downto 0);
     signal video_on: std_logic;
     signal px_x, px_y: std_logic_vector(9 downto 0);
@@ -45,7 +45,7 @@ begin
         );
 
     graphics:
-        entity work.graphics(dispatcher)
+        entity work.fpgalaxy_graphics(dispatcher)
         port map(
             clk => clk, not_reset => not_reset,
             px_x => px_x, px_y => px_y,
@@ -87,5 +87,5 @@ begin
 
     rgb <= rgb_reg;
 
-end behavior;
+end behaviour;
 

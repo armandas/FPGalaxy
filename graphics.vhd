@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-entity graphics is
+entity fpgalaxy_graphics is
     port(
         clk, not_reset: in std_logic;
         px_x, px_y: in std_logic_vector(9 downto 0);
@@ -12,9 +12,9 @@ entity graphics is
         rgb_stream: out std_logic_vector(2 downto 0);
         shooting_sound, destruction_sound: out std_logic
     );
-end graphics;
+end fpgalaxy_graphics;
 
-architecture dispatcher of graphics is
+architecture dispatcher of fpgalaxy_graphics is
     constant A_WIDTH: integer := 256;
     constant DELAY: integer := 25000000;
 
